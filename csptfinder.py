@@ -161,6 +161,7 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                             log.warning(
                                 '[!!] Error: '
                                 f'Invalid Cookie Domain: {parsed_url.hostname}'
+                                f' for {driver.current_url}'
                             )
                 del driver.requests
                 driver.get(url)

@@ -142,12 +142,12 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                 current_hostname = urlparse(driver.current_url).hostname
                 if current_hostname != parsed_url.hostname:
                     # Navigate once to domain to be able to add cookies
+                    init_url = f'{parsed_url.scheme}://{parsed_url.hostname}/'
                     log.warning(
                         'Need to set cookies on headless browser.'
-                        'Navigating once to '
-                        f'{parsed_url.scheme}://{parsed_url.hostname}/'
+                        f'Navigating once to {init_url}'
                     )
-                    driver.get(f'{parsed_url.scheme}://{parsed_url.hostname}/')
+                    driver.get(init_url)
                 for c in cookies.keys():
                     if parsed_url.hostname != '':
                         # Add custom cookies to webdriver

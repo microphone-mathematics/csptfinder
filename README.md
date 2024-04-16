@@ -32,8 +32,16 @@ options:
 ```
 
 ## Example results
+#### Using file with list of URLs
 ```
 $ ./csptfinder.py -f urls.txt -s 1
+[*] [GET]  https://huntdash.xyz/cspt/jamesmfdoom.jpg?query=true  [404]  Parameters: ['path']  | Opener: https://huntdash.xyz/static/clientsidepathtraversalpoc.html?path=jamesmfdoom&ext=jpg&random=true
+[*] [GET]  https://huntdash.xyz/cspt/james.jpgmfdoom?query=true  [404]  Parameters: ['ext']  | Opener: https://huntdash.xyz/static/clientsidepathtraversalpoc.html?path=james&ext=jpgmfdoom&random=true
+```
+
+#### Using single inline URL
+```
+$ ./csptfinder.py -u "https://huntdash.xyz/static/clientsidepathtraversalpoc.html?path=james&ext=jpg&random=true" -s 1
 [*] [GET]  https://huntdash.xyz/cspt/jamesmfdoom.jpg?query=true  [404]  Parameters: ['path']  | Opener: https://huntdash.xyz/static/clientsidepathtraversalpoc.html?path=jamesmfdoom&ext=jpg&random=true
 [*] [GET]  https://huntdash.xyz/cspt/james.jpgmfdoom?query=true  [404]  Parameters: ['ext']  | Opener: https://huntdash.xyz/static/clientsidepathtraversalpoc.html?path=james&ext=jpgmfdoom&random=true
 ```

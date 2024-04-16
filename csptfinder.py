@@ -198,10 +198,10 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                             with open(args.outfile, 'a') as outfile:
                                 outfile.write(f'{flag_msg}\n')
                         sys.stdout.flush()
-    except TimeoutException as ex:
-        log.warning('[!!] Error: ', url, ex)
-    except UnexpectedAlertPresentException as ex:
-        log.warning('[!!] Error: ', url, ex)
+    except TimeoutException:
+        log.warning(f'[!!] Error: TimeOutException for {url}')
+    except UnexpectedAlertPresentException:
+        log.warning(f'[!!] Error: UnexpectedAlertPresentException for {url}')
 
 
 if args.file:
@@ -220,4 +220,3 @@ for url in urls:
         log.warning(f'[**] url: {url}')
     get_ajax_requests(url, sleep, cookies, last_parsed_hostname)
     last_parsed_hostname = urlparse(url).hostname
-

@@ -1,6 +1,8 @@
 # csptfinder.py
 Python script to flag possible Client-Side Path Traversals
 
+Uses Selenium-Wire and Undetected-ChromeDriver under the hood.
+
 
 ## Install
 ```

@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 
 def interceptor(request):
     if args.headers:
+        # Add custom headers
         for h in args.headers.keys():
             del request.headers[h]  # Delete the header first
             request.headers[h] = args.headers[h]
@@ -30,6 +31,8 @@ description = 'Flags possible Client-Side Path Traversals from a list of URLs.'
 parser = argparse.ArgumentParser(
     description=description
 )
+
+# Make file OR url required
 parser_group = parser.add_mutually_exclusive_group(required=True)
 
 parser_group.add_argument(
@@ -40,6 +43,7 @@ parser_group.add_argument(
     '-u', '--url', dest='url', metavar='url', type=str,
     help='URL  (type: str)'
 )
+# Optional arguments
 parser.add_argument(
     '-o', '--outfile', dest='outfile', metavar='outfile', type=str,
     help='output file path  (type: str)'
@@ -78,6 +82,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 if args.outfile:
+    # Create output file
     with open(args.outfile, 'w') as outfile:
         pass
 
@@ -88,6 +93,7 @@ options.add_argument('--ignore-certificate-errors')
 options.add_argument('--ignore-ssl-errors')
 options.add_argument('--headless')
 if args.proxy:
+    # Set custom proxy
     seleniumwire_options = {'proxy': {'https': args.proxy, 'http': args.proxy}}
 else:
     seleniumwire_options = {}
@@ -104,11 +110,13 @@ if args.headers:
 
 cookie = SimpleCookie()
 if args.cookies:
+    # Create cookie dict from cookie string
     cookie.load(args.cookies)
     cookies = {k: v.value for k, v in cookie.items()}
 else:
     cookies = {}
 headers = {}
+flagged_messages = []
 
 
 def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
@@ -136,6 +144,7 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                     driver.get(f'{parsed_url.scheme}://{parsed_url.hostname}/')
                 for c in cookies.keys():
                     if parsed_url.hostname != '':
+                        # Add custom cookies to webdriver
                         try:
                             driver.add_cookie({
                                 'name': c,
@@ -175,13 +184,6 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                             f'Parameters: {flagged_params}  '
                             f'| Opener: {url}'
                         )
-                        print(flag_msg)
-                        if args.outfile:
-                            with open(args.outfile, 'r') as outfile:
-                                outfile_lines = outfile.read().splitlines()
-                            with open(args.outfile, 'a') as outfile:
-                                if flag_msg not in outfile_lines:
-                                    outfile.write(f'{flag_msg}\n')
                     else:
                         flag_msg = (
                             f'[*] [{request.method}]  '
@@ -189,13 +191,13 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                             f'Parameters: {flagged_params}  '
                             f'| Opener: {url}'
                         )
+                    if flag_msg not in flagged_messages:
+                        print(flag_msg)
+                        flagged_messages.append(flag_msg)
                         if args.outfile:
-                            with open(args.outfile, 'r') as outfile:
-                                outfile_lines = outfile.read().splitlines()
                             with open(args.outfile, 'a') as outfile:
-                                if flag_msg not in outfile_lines:
-                                    outfile.write(f'{flag_msg}\n')
-                    sys.stdout.flush()
+                                outfile.write(f'{flag_msg}\n')
+                        sys.stdout.flush()
     except TimeoutException as ex:
         log.warning('[!!] Error: ', url, ex)
     except UnexpectedAlertPresentException as ex:

@@ -139,8 +139,14 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
             if not args.cookies:
                 driver.get(url)
             else:
-                if last_parsed_hostname != parsed_url.hostname:
+                current_hostname = urlparse(driver.current_url).hostname
+                if current_hostname != parsed_url.hostname:
                     # Navigate once to domain to be able to add cookies
+                    log.warning(
+                        'Need to set cookies on headless browser.'
+                        'Navigating once to '
+                        f'{parsed_url.scheme}://{parsed_url.hostname}/'
+                    )
                     driver.get(f'{parsed_url.scheme}://{parsed_url.hostname}/')
                 for c in cookies.keys():
                     if parsed_url.hostname != '':
@@ -151,9 +157,11 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                                 'domain': parsed_url.hostname,
                                 'value': cookies[c],
                             })
-                        except InvalidCookieDomainException as e:
-                            log.warning(f'[!!] Error: {e}')
-                            log.warning(parsed_url.hostname)
+                        except InvalidCookieDomainException:
+                            log.warning(
+                                '[!!] Error: '
+                                f'Invalid Cookie Domain: {parsed_url.hostname}'
+                            )
                 del driver.requests
                 driver.get(url)
             time.sleep(sleep)
@@ -220,3 +228,4 @@ for url in urls:
         log.warning(f'[**] url: {url}')
     get_ajax_requests(url, sleep, cookies, last_parsed_hostname)
     last_parsed_hostname = urlparse(url).hostname
+

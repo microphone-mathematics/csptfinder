@@ -144,7 +144,7 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                     # Navigate once to domain to be able to add cookies
                     init_url = f'{parsed_url.scheme}://{parsed_url.hostname}/'
                     log.warning(
-                        'Need to set cookies on headless browser.'
+                        'Need to set cookies on headless browser. '
                         f'Navigating once to {init_url}'
                     )
                     driver.get(init_url)

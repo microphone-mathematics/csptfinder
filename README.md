@@ -1,4 +1,4 @@
-# csptfinder
+# csptfinder.py
 Python script to flag possible Client-Side Path Traversals
 
 

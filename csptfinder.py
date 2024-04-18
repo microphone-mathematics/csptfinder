@@ -58,6 +58,11 @@ parser.add_argument(
     help=cookie_help
 )
 parser.add_argument(
+    '--cookies-domain', dest='cookies_domain',
+    metavar='domain', type=str,
+    help='use custom domain for cookies'
+)
+parser.add_argument(
     '-x', dest='proxy', metavar='--proxy', type=str,
     help='(http|https|socks5)://PROXYHOST:PROXYPORT  (type: str)'
 )
@@ -78,6 +83,11 @@ parser.add_argument(
     '-vv', dest='verbose', metavar='verbose',
     action=argparse.BooleanOptionalAction,
     help='verbose debug mode  (type: bool)'
+)
+parser.add_argument(
+    '--silent', dest='silent',
+    action=argparse.BooleanOptionalAction,
+    help='silent mode - hide errors  (type: bool)'
 )
 args = parser.parse_args()
 
@@ -143,26 +153,34 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                 if current_hostname != parsed_url.hostname:
                     # Navigate once to domain to be able to add cookies
                     init_url = f'{parsed_url.scheme}://{parsed_url.hostname}/'
-                    log.warning(
-                        'Need to set cookies on headless browser. '
-                        f'Navigating once to {init_url}'
-                    )
+                    if args.verbose or args.informative:
+                        log.warning(
+                            '\nNeed to set cookies on headless browser. '
+                            f'Navigating once to {init_url}\n'
+                        )
                     driver.get(init_url)
+                    current_hostname = urlparse(driver.current_url).hostname
                 for c in cookies.keys():
                     if parsed_url.hostname != '':
                         # Add custom cookies to webdriver
                         try:
+                            if args.cookies_domain:
+                                cookies_domain = args.cookies_domain
+                            else:
+                                cookies_domain = parsed_url.hostname
+                                # cookies_domain = urlparse(driver.current_url).hostname
                             driver.add_cookie({
                                 'name': c,
-                                'domain': parsed_url.hostname,
+                                'domain': current_hostname,
                                 'value': cookies[c],
                             })
                         except InvalidCookieDomainException:
-                            log.warning(
-                                '[!!] Error: '
-                                f'Invalid Cookie Domain: {parsed_url.hostname}'
-                                f' for {driver.current_url}'
-                            )
+                            if not args.silent:
+                                log.warning(
+                                    '[!!] Error: '
+                                    f'Invalid Cookie Domain: {current_hostname}'
+                                    f' for {driver.current_url}'
+                                )
                 del driver.requests
                 driver.get(url)
             time.sleep(sleep)
@@ -208,9 +226,13 @@ def get_ajax_requests(url, sleep, cookies, last_parsed_hostname):
                                 outfile.write(f'{flag_msg}\n')
                         sys.stdout.flush()
     except TimeoutException:
-        log.warning(f'[!!] Error: TimeOutException for {url}')
+        if not args.silent:
+            log.warning(f'[!!] Error: TimeOutException for {url}')
     except UnexpectedAlertPresentException:
-        log.warning(f'[!!] Error: UnexpectedAlertPresentException for {url}')
+        if not args.silent:
+            log.warning(
+                f'[!!] Error: UnexpectedAlertPresentException for {url}'
+            )
 
 
 if args.file:

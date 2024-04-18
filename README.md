@@ -13,7 +13,7 @@ cd csptfinder && pip3 install -r requirements.txt
 ## Usage
 ```
 $ ./csptfinder.py -h
-usage: csptfinder.py [-h] (-f file | -u url) [-o outfile] [-s sleeptime] [-b cookie_string] [-x --proxy] [-H --header] [-v] [-vv]
+usage: csptfinder.py [-h] (-f file | -u url) [-o outfile] [-s sleeptime] [-b cookie_string] [--cookies-domain domain] [-x --proxy] [-H --header] [-v] [-vv] [--silent | --no-silent]
 
 Flags possible Client-Side Path Traversals from a list of URLs.
 
@@ -27,10 +27,14 @@ options:
                         sleep time in seconds (type: float)
   -b cookie_string, --cookies cookie_string
                         CookieName=CookieValue; CookieName2=CookieValue2.. (type: str)
+  --cookies-domain domain
+                        use custom domain for cookies
   -x --proxy            (http|https|socks5)://PROXYHOST:PROXYPORT (type: str)
   -H --header           {"HeaderName": "HeaderValue", "HeaderName2": "HeaderValue2"} (type: json)
   -v                    informative debug mode (type: bool)
   -vv                   verbose debug mode (type: bool)
+  --silent, --no-silent
+                        silent mode - hide errors (type: bool)
 ```
 
 ## Example results
